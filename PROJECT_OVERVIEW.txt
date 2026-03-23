@@ -1,0 +1,48 @@
+AURA AI - INTELLIGENT COMPLAINT MANAGEMENT SYSTEM
+===================================================
+
+1. PROJECT TECH STACK
+---------------------
+FRONTEND:
+- React (Vite-based)
+- Tailwind CSS (For styling and animations)
+- Recharts (For data visualization and charts)
+- Lucide React (For modern, clean iconography)
+- Axios (For API interaction)
+
+BACKEND:
+- Node.js & Express.js (Core server architecture)
+- MongoDB Atlas (Cloud database storage)
+- Google Gemini AI (gemini-1.5-flash for complaint analysis)
+- JWT (JSON Web Tokens for secure sessions)
+- Bcryptjs (For credential encryption)
+
+2. CORE FEATURES
+----------------
+- AI-POWERED ANALYSIS: Automatically detects the category (Fraud, Loan, etc.), priority, and sentiment of every incoming complaint.
+- AUTO-RESPONSE GENERATOR: Gemini provides a drafted, professional response for staff to use, saving hours of manual drafting.
+- EXECUTIVE DASHBOARD: Real-time data visualization showing categorical distribution and status trends.
+- COMPLAINT MANAGEMENT: A filterable system where staff can search, filter by priority, and update complaint statuses.
+- GLASSMORPHISM DESIGN: A premium, modern UI with dark/light mode support and smooth transitions.
+- SECURE AUTHENTICATION: Hardened login process with session management to protect customer data.
+
+3. WORKING FLOW
+---------------
+STEP 1: SUBMISSION
+A customer or staff member submits a complaint text through the platform.
+
+STEP 2: AI PROCESSING
+The backend captures the text and sends it to the Gemini AI engine. The AI analyzes the language to identify:
+- What the problem is about (Category).
+- How urgent it is (Priority).
+- The customer's emotional state (Sentiment).
+- The best way to respond (Suggested Response).
+
+STEP 3: SECURE STORAGE
+The complaint and all AI-generated insights are saved to the MongoDB Atlas cloud database for permanent record-keeping.
+
+STEP 4: DASHBOARD SYNC
+The Executive Dashboard instantly updates its counters and charts to reflect the new data, allowing managers to see trends as they happen.
+
+STEP 5: RESOLUTION
+Staff members review the complaint, consult the AI's suggested response, and mark the issue as "Resolved" once the customer is satisfied.
