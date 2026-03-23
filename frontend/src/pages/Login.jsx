@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
-import { login } from '../services/api';
+import { Shield, Mail, Lock, Loader2, AlertCircle, User as UserIcon, ArrowRight } from 'lucide-react';
+import { login, register } from '../services/api';
 
 const Login = () => {
+    const [isRegister, setIsRegister] = useState(false);
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('admin@aura.ai');
     const [password, setPassword] = useState('admin123');
     const [loading, setLoading] = useState(false);
@@ -16,12 +18,19 @@ const Login = () => {
         setError('');
 
         try {
-            const data = await login(email, password);
+            let data;
+            if (isRegister) {
+                // Register as Customer
+                data = await register({ name, email, password });
+            } else {
+                data = await login(email, password);
+            }
+            
             localStorage.setItem('aura_token', data.token);
             localStorage.setItem('aura_user', JSON.stringify(data));
             window.location.href = '/';
         } catch (err) {
-            setError(err.response?.data?.message || 'Login failed. Try admin@aura.ai / admin123');
+            setError(err.response?.data?.message || (isRegister ? 'Registration failed' : 'Login failed. Try admin@aura.ai / admin123'));
         } finally {
             setLoading(false);
         }
@@ -38,11 +47,32 @@ const Login = () => {
                         <div className="inline-flex p-4 bg-aura-dark rounded-3xl shadow-xl shadow-aura-dark/20 mb-6 group hover:scale-110 transition-transform duration-500">
                             <Shield className="w-8 h-8 text-white group-hover:rotate-12 transition-transform" />
                         </div>
-                        <h1 className="text-3xl font-black text-aura-dark tracking-tight mb-2">Welcome Back</h1>
-                        <p className="text-gray-400 font-medium">AURA AI Management Console</p>
+                        <h1 className="text-3xl font-black text-aura-dark tracking-tight mb-2">
+                            {isRegister ? 'Establish Access' : 'Welcome Back'}
+                        </h1>
+                        <p className="text-gray-400 font-medium">
+                            {isRegister ? 'Join the AURA AI Intelligence Network' : 'AURA AI Management Console'}
+                        </p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+                        {isRegister && (
+                             <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Identity Name</label>
+                                <div className="relative group">
+                                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-aura-light transition-colors" />
+                                    <input 
+                                        className="w-full pl-12 pr-4 py-4 bg-gray-50/50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:ring-4 focus:ring-aura-light/5 focus:border-aura-light/20 transition-all font-medium text-sm"
+                                        type="text"
+                                        placeholder="Your Full Name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        required={isRegister}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Email System</label>
                             <div className="relative group">
@@ -85,15 +115,20 @@ const Login = () => {
                             disabled={loading}
                             className="w-full py-4 bg-aura-dark text-white rounded-2xl font-bold shadow-xl shadow-aura-dark/20 hover:bg-aura-light hover:-translate-y-1 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:shadow-none flex items-center justify-center space-x-2"
                         >
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>Initialize Terminal</span>}
+                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>{isRegister ? 'Create Account' : 'Initialize Terminal'}</span>}
                         </button>
 
-                        <div className="flex justify-between items-center text-xs text-gray-400 px-1 pt-2">
-                            <label className="flex items-center space-x-2 cursor-pointer group">
-                                <div className="w-4 h-4 border-2 border-gray-200 rounded group-hover:border-aura-light transition-colors"></div>
-                                <span>Remember security session</span>
-                            </label>
-                            <button type="button" className="hover:text-aura-light transition-colors">Reset Access</button>
+                        <div className="text-center">
+                            <button 
+                                type="button" 
+                                onClick={() => setIsRegister(!isRegister)}
+                                className="text-xs font-bold text-gray-400 hover:text-aura-light transition-colors flex items-center justify-center mx-auto space-x-1"
+                            >
+                                <span>{isRegister ? 'Already have access?' : "Don't have an account?"}</span>
+                                <span className="text-aura-light flex items-center">
+                                    {isRegister ? 'Login' : 'Register Now'} <ArrowRight className="ml-1 w-3 h-3" />
+                                </span>
+                            </button>
                         </div>
                     </form>
                 </div>

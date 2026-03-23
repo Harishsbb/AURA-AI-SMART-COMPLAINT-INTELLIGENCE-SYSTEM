@@ -2,11 +2,17 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, MessageSquare, PieChart, Bell, Settings, Shield } from 'lucide-react';
 
 const Sidebar = () => {
+    const userString = localStorage.getItem('aura_user');
+    const user = userString ? JSON.parse(userString) : null;
+    const isAdmin = user?.isAdmin;
+
     const menuItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
         { icon: MessageSquare, label: 'Complaints', path: '/complaints' },
-        { icon: PieChart, label: 'Analytics', path: '/analytics' },
-        { icon: Bell, label: 'Alerts', path: '/alerts' },
+        ...(isAdmin ? [
+            { icon: PieChart, label: 'Analytics', path: '/analytics' },
+            { icon: Bell, label: 'Alerts', path: '/alerts' },
+        ] : []),
         { icon: Settings, label: 'Settings', path: '/settings' },
     ];
 

@@ -8,6 +8,10 @@ const ComplaintList = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterPriority, setFilterPriority] = useState('All');
+    
+    const userString = localStorage.getItem('aura_user');
+    const user = userString ? JSON.parse(userString) : null;
+    const isAdmin = user?.isAdmin;
 
     useEffect(() => {
         loadComplaints();
@@ -60,8 +64,12 @@ const ComplaintList = () => {
         <div className="space-y-8 animate-in fade-in duration-700">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-aura-dark">Complaints Management</h1>
-                    <p className="text-gray-400 text-sm">Review and resolve AI-processed customer issues</p>
+                    <h1 className="text-2xl font-bold text-aura-dark dark:text-white">
+                        {isAdmin ? 'System-wide Complaints' : 'Your Personal Submissions'}
+                    </h1>
+                    <p className="text-gray-400 text-sm">
+                        {isAdmin ? 'Review and resolve AI-processed customer issues' : 'Track the status and AI insights of your reports'}
+                    </p>
                 </div>
                 <button 
                     onClick={exportToPDF}
@@ -114,9 +122,17 @@ const ComplaintList = () => {
                                         <td className="px-6 py-5">
                                             <div className="max-w-xs md:max-w-sm">
                                                 <p className="text-sm text-aura-dark font-medium line-clamp-2 mb-1">{c.text}</p>
-                                                <div className="flex items-center text-[10px] text-gray-400">
-                                                    <Clock className="w-3 h-3 mr-1" />
-                                                    {new Date(c.createdAt).toLocaleString()}
+                                                <div className="flex items-center space-x-3 text-[10px] text-gray-400">
+                                                    <div className="flex items-center">
+                                                        <Clock className="w-3 h-3 mr-1" />
+                                                        {new Date(c.createdAt).toLocaleString()}
+                                                    </div>
+                                                    {isAdmin && c.user && (
+                                                        <div className="flex items-center text-aura-light font-bold">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-aura-light mr-1.5"></div>
+                                                            {c.user.name}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </td>
@@ -137,18 +153,24 @@ const ComplaintList = () => {
                                                 <span className="text-xs font-semibold capitalize text-aura-dark">{c.status}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-5 text-right">
-                                            {c.status === 'pending' ? (
-                                                <button 
-                                                    onClick={() => handleStatusUpdate(c._id, 'resolved')}
-                                                    className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
-                                                    title="Mark as Resolved"
-                                                >
-                                                    <ShieldCheck className="w-5 h-5" />
-                                                </button>
+                                        <td className="px-6 py-5 text-right flex justify-end">
+                                            {isAdmin ? (
+                                                c.status === 'pending' ? (
+                                                    <button 
+                                                        onClick={() => handleStatusUpdate(c._id, 'resolved')}
+                                                        className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                                                        title="Mark as Resolved"
+                                                    >
+                                                        <ShieldCheck className="w-5 h-5" />
+                                                    </button>
+                                                ) : (
+                                                    <div className="p-2 text-green-600">
+                                                        <ShieldCheck className="w-5 h-5" />
+                                                    </div>
+                                                )
                                             ) : (
-                                                <div className="p-2 text-green-600">
-                                                    <ShieldCheck className="w-5 h-5" />
+                                                <div className="text-gray-300 p-2">
+                                                    <ShieldCheck className="w-5 h-5 opacity-40" />
                                                 </div>
                                             )}
                                         </td>

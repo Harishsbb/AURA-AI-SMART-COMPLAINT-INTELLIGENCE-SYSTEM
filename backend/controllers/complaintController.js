@@ -16,6 +16,7 @@ const createComplaint = async (req, res) => {
         const analysis = await analyzeComplaint(text);
 
         const complaint = new Complaint({
+            user: req.user._id,
             text,
             category: analysis.category,
             sentiment: analysis.sentiment,
@@ -36,7 +37,13 @@ const createComplaint = async (req, res) => {
 // @access  Private/Admin
 const getComplaints = async (req, res) => {
     try {
-        const complaints = await Complaint.find({}).sort({ createdAt: -1 });
+        let query = {};
+        if (!req.user.isAdmin) {
+            query = { user: req.user._id };
+        }
+        const complaints = await Complaint.find(query)
+            .populate('user', 'name email')
+            .sort({ createdAt: -1 });
         res.json(complaints);
     } catch (error) {
         res.status(500).json({ message: error.message });

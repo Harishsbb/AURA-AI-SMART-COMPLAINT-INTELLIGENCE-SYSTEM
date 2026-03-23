@@ -1,6 +1,9 @@
 import { Search, User, LogOut, Bell, Menu } from 'lucide-react';
 
 const Navbar = () => {
+    const userString = localStorage.getItem('aura_user');
+    const user = userString ? JSON.parse(userString) : null;
+
     return (
         <header className="h-20 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 px-8 flex items-center justify-between z-10 transition-colors duration-500">
             <div className="flex items-center flex-1 max-w-md">
@@ -24,8 +27,8 @@ const Navbar = () => {
 
                 <div className="flex items-center space-x-3">
                     <div className="text-right hidden sm:block">
-                        <p className="text-sm font-semibold text-aura-dark dark:text-white">Admin User</p>
-                        <p className="text-xs text-gray-400">Chief Compliance Officer</p>
+                        <p className="text-sm font-semibold text-aura-dark dark:text-white">{user?.name || 'User'}</p>
+                        <p className="text-xs text-gray-400">{user?.isAdmin ? 'Chief Compliance Officer' : 'Valued Customer'}</p>
                     </div>
                     <div className="w-10 h-10 rounded-full bg-aura-light/10 border border-aura-light/20 flex items-center justify-center">
                         <User className="w-5 h-5 text-aura-light" />

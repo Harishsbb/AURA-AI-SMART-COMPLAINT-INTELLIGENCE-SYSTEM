@@ -44,7 +44,8 @@ const ComplaintForm = ({ onSuccess }) => {
         setResult(null);
 
         try {
-            const data = await createComplaint({ text });
+            const token = localStorage.getItem('aura_token');
+            const data = await createComplaint({ text }, token);
             setResult(data);
             setText('');
             if (onSuccess) onSuccess(data);
