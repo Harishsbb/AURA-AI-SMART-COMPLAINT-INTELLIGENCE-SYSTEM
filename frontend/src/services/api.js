@@ -36,6 +36,27 @@ export const updateComplaintStatus = async (id, status, token) => {
     return response.data;
 };
 
+export const deleteComplaint = async (id, token) => {
+    const response = await api.delete(`/complaints/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+};
+
+export const chatWithAI = async (message, history, token) => {
+    const response = await api.post('/ai/chat', { message, history }, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+};
+
+export const fetchTrends = async (token) => {
+    const response = await api.get('/complaints/trends', {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+};
+
 export const login = async (email, password) => {
     const response = await api.post('/users/login', { email, password });
     return response.data;

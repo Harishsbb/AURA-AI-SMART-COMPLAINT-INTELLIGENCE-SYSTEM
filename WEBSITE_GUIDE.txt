@@ -1,0 +1,207 @@
+================================================================================
+  AURA AI — WEBSITE GUIDE & USAGE NOTES
+  Version 2.0  |  Date: 2026-04-03
+================================================================================
+
+WHAT IS AURA AI?
+----------------
+AURA AI is an AI-powered banking complaint management platform that uses
+Google Gemini to automatically analyze, categorize, prioritize, and draft
+responses for customer complaints — saving bank staff hours of manual work.
+
+DEMO LOGIN CREDENTIALS
+-----------------------
+  Admin :  admin@aura.ai  /  admin123
+  Customer: Register a new account on the login page
+
+
+================================================================================
+  SECTION 1 — HOW TO USE AS ADMIN
+================================================================================
+
+STEP 1: Log In
+--------------
+  - Open the app and enter: admin@aura.ai / admin123
+  - The system detects your Admin role and unlocks all admin-only features.
+
+STEP 2: Admin Intelligence Console (Dashboard)
+----------------------------------------------
+  - 4 gradient stat cards at the top:
+      • Total Complaints  (indigo)   — all complaints ever submitted
+      • Pending Resolution (amber)   — complaints awaiting action
+      • Resolved Cases    (green)    — completed complaints
+      • Resolution Rate   (pink)     — % of resolved vs total
+  - 7-Day Complaint Volume chart — LIVE data from MongoDB (last 7 days)
+  - Category Breakdown pie chart — each category color-coded with progress bars
+  - Recent Submissions table — last 5 complaints with priority badges
+
+STEP 3: Manage Complaints (/complaints)
+----------------------------------------
+  - SEARCH: Type in the search bar to filter by complaint text or category
+  - FILTER: Click All / High / Medium / Low to filter by priority level
+  - EXPAND: Click the ▾ chevron to see the AI-generated suggested response
+  - RESOLVE: Click the ✓ shield icon to mark a complaint as resolved
+  - DELETE: Click the 🗑 trash icon to permanently delete a complaint
+            (confirmation dialog appears first)
+  - EXPORT: Click "Export PDF" to print/save the current view
+
+STEP 4: Analytics Page (/analytics)
+-------------------------------------
+  - Resolution Rate card with animated progress bar
+  - Resolved and Pending count cards
+  - Bar chart: complaints by category (live data)
+  - Donut chart: sentiment distribution (Positive/Neutral/Negative/Urgent)
+
+STEP 5: Alerts Page (/alerts)
+-------------------------------
+  - System status banners (operational notices)
+  - Live list of HIGH-PRIORITY and URGENT-SENTIMENT complaints
+    that are still PENDING — your critical action queue
+  - Shows count badge of open urgent items
+
+STEP 6: AI Assistant (/ai)
+---------------------------
+  - Full chat interface powered by Google Gemini
+  - Has LIVE access to your dashboard data before each response
+  - Suggested prompts available on the right sidebar:
+      • "Summarize today's complaint trends"
+      • "Which category has the highest volume?"
+      • "How many high-priority issues are unresolved?"
+      • "Give me insights on customer sentiment"
+  - Copy any AI response using the copy button
+  - Clear chat with the reset button at the top right
+
+STEP 7: Guide & Notes (/notes)
+--------------------------------
+  - Tabbed documentation page with 4 sections:
+      Overview | Admin Guide | Customer Guide | Features
+
+STEP 8: Settings (/settings)
+------------------------------
+  - Toggle dark mode on/off (persists to localStorage)
+
+ADMIN-ONLY FEATURES:
+  Analytics Page, Alerts Page, Resolve Button, Delete Button,
+  System-wide Stats, 7-Day Trend Chart, All Users' Complaints,
+  Full AI context data in Assistant
+
+
+================================================================================
+  SECTION 2 — HOW TO USE AS CUSTOMER
+================================================================================
+
+STEP 1: Register an Account
+-----------------------------
+  - On the Login page, click "Register now"
+  - Enter: Full Name, Email, Password
+  - Your account is created as Customer role automatically
+
+STEP 2: Customer Dashboard (/)
+--------------------------------
+  - Welcome banner with your first name
+  - 3 stat cards: Total Requests, Pending, Resolved
+  - Recent Submissions list (last 4 complaints)
+  - "How It Works" step-by-step guide panel
+  - "New Complaint" button to jump to the form
+
+STEP 3: Submit a Complaint (/complaints)
+-----------------------------------------
+  - The complaint form is on the right side of the page
+  - Type your issue (up to 500 characters — live counter shown)
+  - OR click the 🎤 Mic button for voice input
+  - Click "Analyze & Submit"
+  - AI processes in 2-5 seconds and shows results:
+      • Category  (Fraud / Loan / Account / Card / Other)
+      • Sentiment (Positive / Neutral / Negative / Urgent)
+      • Priority  (High=red / Medium=orange / Low=blue)
+      • AI Suggested Response (what the bank will tell you)
+
+STEP 4: Track Your Complaints
+-------------------------------
+  - All your complaints appear in the table on the left
+  - Filter by priority: All / High / Medium / Low
+  - Search by text or category using the search bar
+  - Click ▾ chevron on any row to see the AI suggested response
+  - Status dot:  Pulsing orange = Pending  |  Solid green = Resolved
+
+STEP 5: AI Assistant (/ai)
+---------------------------
+  - Ask the AI about your specific complaints
+  - The AI has live access to YOUR complaint data
+  - Try asking:
+      • "What is the status of my complaints?"
+      • "How long does it take to resolve a Fraud complaint?"
+      • "What happens after I submit a complaint?"
+      • "I have an urgent banking issue — what should I do?"
+
+CUSTOMER TIPS:
+  ✓ Be specific — include dates, account details, exact issue description
+  ✓ Check your dashboard daily for status updates
+  ✓ Read the AI Suggested Response to know what reply to expect
+  ✓ Use voice input if you're on mobile or can't type easily
+
+
+================================================================================
+  SECTION 3 — KEY FEATURES REFERENCE
+================================================================================
+
+  Feature                  | What it does
+  -------------------------|------------------------------------------------
+  Gemini AI Analysis        | Auto-categorize, sentiment, priority, response
+  7-Day Trend Chart         | Real MongoDB data, not hardcoded
+  Resolution Rate Card      | Live calculated % (resolved / total * 100)
+  Category Pie Chart        | Live aggregation with progress bars
+  Expandable AI Response    | Click ▾ on any complaint to see AI draft
+  Admin Delete              | Trash icon with confirm dialog
+  Admin Resolve             | Shield icon changes status instantly
+  Priority Filter Buttons   | All / High / Medium / Low tabs
+  Search Bar                | Filters by text content + category
+  AI Chat Assistant         | Gemini with LIVE system context injected
+  Suggested Prompts         | 6 pre-written prompts for quick starts
+  Voice Input               | Web Speech API in complaint form
+  Character Counter         | Live 0/500 counter with color warning
+  Dark Mode                 | Full dark mode, persisted to localStorage
+  Dark Mode Toggle in Navbar| Moon/Sun icon in top navbar
+  Gradient Stat Cards       | Animated, color-coded, hover lift effect
+  Shimmer Loading States    | Placeholder animations while data loads
+  PDF Export                | Browser print dialog from Complaints page
+  Alerts Page               | Only shows High/Urgent pending complaints
+  Analytics Sentiment Chart | Donut chart of all complaint sentiments
+  Analytics Bar Chart       | Grouped bar chart by category
+  Notes / Guide Page        | Full tabbed documentation (this file in-app)
+
+================================================================================
+  SECTION 4 — PAGE MAP
+================================================================================
+
+  Route          | Page                 | Access
+  ---------------|----------------------|---------------------------
+  /login         | Login / Register     | Public
+  /              | Dashboard            | Admin or Customer
+  /complaints    | Complaint List + Form| All users
+  /analytics     | Analytics Charts     | Admin only
+  /alerts        | High-Priority Feed   | Admin only
+  /ai            | AI Chat Assistant    | All users (context varies)
+  /notes         | Guide & Documentation| All users
+  /settings      | Platform Settings    | All users
+
+================================================================================
+  SECTION 5 — BACKEND API ENDPOINTS
+================================================================================
+
+  Auth:
+    POST /api/users          → Register new user
+    POST /api/users/login    → Login, returns JWT token
+
+  Complaints:
+    GET    /api/complaints       → Get complaints (own or all if admin)
+    POST   /api/complaints       → Submit new complaint (AI-analyzed)
+    GET    /api/complaints/stats → Admin: total/pending/resolved/byCategory
+    GET    /api/complaints/trends→ Admin: 7-day daily count array
+    PUT    /api/complaints/:id   → Admin: update status
+    DELETE /api/complaints/:id   → Admin: delete complaint
+
+  AI:
+    POST /api/ai/chat            → Chat with AI (injects live context)
+
+================================================================================

@@ -3,7 +3,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const complaintRoutes = require('./routes/complaintRoutes');
-const userRoutes = require('./routes/userRoutes');
+const userRoutes      = require('./routes/userRoutes');
+const aiRoutes        = require('./routes/aiRoutes');
 
 dotenv.config();
 
@@ -15,7 +16,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/complaints', complaintRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/users',      userRoutes);
+app.use('/api/ai',         aiRoutes);
 
 app.get('/', (req, res) => {
     res.send('AURA AI API is running...');

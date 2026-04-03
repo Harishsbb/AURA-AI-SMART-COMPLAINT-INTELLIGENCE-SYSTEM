@@ -1,0 +1,341 @@
+================================================================================
+  AURA AI — PROJECT IMPROVEMENTS LOG
+  Date: 2026-04-03  |  Last Updated: 2026-04-03 (UI Overhaul)
+================================================================================
+
+OVERVIEW
+--------
+This file documents every improvement made to the AURA AI Smart Complaint
+Intelligence System. Changes were made across both the backend (Node/Express)
+and frontend (React/Vite) to fix bugs, add real data, and polish the UI for
+the hackathon demo.
+
+--------------------------------------------------------------------------------
+BACKEND CHANGES
+--------------------------------------------------------------------------------
+
+1. CRITICAL BUG FIX — complaintController.js (line 113)
+   ---------------------------------------------------
+   BEFORE:  constByCategory = await Complaint.aggregate([...])
+   AFTER:   const byCategory = await Complaint.aggregate([...])
+
+   Impact: The app was CRASHING every time anyone visited the Admin Dashboard
+   because `constByCategory` is not valid JavaScript (missing space between
+   `const` and the variable name). This is now fixed — the /api/complaints/stats
+   endpoint works correctly.
+
+2. NEW ENDPOINT — GET /api/complaints/trends
+   -----------------------------------------
+   File: backend/controllers/complaintController.js  (new getTrends function)
+   File: backend/routes/complaintRoutes.js  (new route added)
+
+   What it does: Returns an array of 7 objects, one for each of the last 7 days,
+   with the count of complaints submitted that day. Uses MongoDB's $dayOfWeek
+   aggregation and filters by createdAt >= 7 days ago.
+
+   Example response:
+   [
+     { "name": "Thu", "complaints": 2 },
+     { "name": "Fri", "complaints": 5 },
+     ...
+   ]
+
+   Access: Protected, Admin only (same as /stats).
+
+--------------------------------------------------------------------------------
+FRONTEND CHANGES
+--------------------------------------------------------------------------------
+
+3. api.js — Two new API functions added
+   -------------------------------------
+   File: frontend/src/services/api.js
+
+   a) deleteComplaint(id, token)
+      Calls DELETE /api/complaints/:id — the backend route existed but was never
+      wired into the frontend. Admins can now delete complaints from the UI.
+
+   b) fetchTrends(token)
+      Calls GET /api/complaints/trends to get the 7-day real data for the
+      Admin Dashboard area chart.
+
+4. AdminDashboard.jsx — Real data + new stat card + polish
+   --------------------------------------------------------
+   File: frontend/src/pages/AdminDashboard.jsx
+
+   Changes:
+   - Area chart now uses LIVE data from /api/complaints/trends instead of the
+     hardcoded Mon-Sun dummy array (40, 30, 45, 28, 55, 20, 15).
+   - Chart title updated to "7-Day Complaint Volume" with subtitle "Live data
+     from the last 7 days".
+   - Loading skeleton added for chart while data is fetching.
+   - "Avg. Response Time" stat card replaced with "Resolution Rate" — a real
+     metric calculated as (resolved / total) * 100%. Shows a live percentage.
+   - Priority badges added to the recent complaints table (was missing priority
+     column before). Color-coded: High=red, Medium=orange, Low=blue.
+   - Loading skeletons added to the table rows while data loads.
+   - "View Intelligence Center" button changed from a plain button to a proper
+     anchor link pointing to /complaints.
+
+5. App.jsx — Analytics page rebuilt, Alerts page rebuilt
+   ------------------------------------------------------
+   File: frontend/src/App.jsx
+
+   a) Analytics Page (was: placeholder text)
+      Now shows:
+      - Three summary stat cards: Resolution Rate (with progress bar), Resolved
+        count, Pending count. All populated from /api/complaints/stats.
+      - "Complaints by Category" horizontal bar chart using real byCategory data
+        from the stats endpoint. Each bar is color-coded.
+      - "Sentiment Distribution" donut pie chart built from all complaints data,
+        grouped client-side by sentiment. Color mapping: Positive=green,
+        Neutral=grey, Negative=orange, Urgent=red.
+
+   b) Alerts Page (was: two hardcoded dummy alert boxes)
+      Now shows:
+      - Two system status banners (operational notice + maintenance notice).
+      - "Active High-Priority Complaints" live feed — fetches all complaints,
+        filters to those where priority='High' OR sentiment='Urgent' AND status
+        is still 'pending'. Displayed as a live list with red pulse indicators.
+      - "X open" badge showing real count.
+      - Empty state with green checkmark if no urgent issues exist.
+      - Loading skeletons while data is fetching.
+
+6. Complaints.jsx — Delete button, dark mode, expandable AI response
+   ------------------------------------------------------------------
+   File: frontend/src/pages/Complaints.jsx
+
+   Changes:
+   a) Delete button for admins
+      Each complaint row now has a trash icon button (Trash2) for admins.
+      Clicking it shows a browser confirm dialog, then calls DELETE /api/complaints/:id.
+      The row disappears immediately from the list on success (optimistic update).
+      The button is disabled while deletion is in progress.
+
+   b) Dark mode support
+      The entire table and search/filter bar now properly support dark mode.
+      All hardcoded `bg-white` and `text-gray-` classes now have `dark:` variants
+      (dark:bg-slate-800, dark:text-gray-200, dark:border-slate-700, etc.).
+
+   c) Expandable AI Response panel
+      A chevron button (down/up) is added per row. Clicking it expands an inline
+      row below showing the AI-generated suggested response for that complaint,
+      with a Bot icon. Only one row can be expanded at a time.
+
+   d) Priority badge dark mode fix
+      Priority badges (High/Medium/Low) now have proper dark: variants so they
+      are legible in dark mode.
+
+   e) Live stats in sidebar widget
+      The "Automated Optimization" card now shows real resolved/pending counts
+      from the loaded complaints array, instead of static text.
+
+7. ComplaintForm.jsx — Character counter, priority colors, dark mode
+   ------------------------------------------------------------------
+   File: frontend/src/components/ComplaintForm.jsx
+
+   Changes:
+   a) Character counter
+      Live counter shows "X/500 characters" below the textarea. Text turns
+      orange when above 85% of the limit, red when at the limit. Input is
+      capped at 500 characters (via .slice(0, MAX_CHARS)).
+
+   b) Fixed priority badge colors
+      Previously both Medium and Low priorities showed as blue. Now:
+        High   → red (bg-red-50 / text-red-600)
+        Medium → orange (bg-orange-50 / text-orange-600)   ← FIXED
+        Low    → blue (bg-blue-50 / text-blue-600)
+
+   c) Full dark mode support
+      Textarea, result cards, error message box, and header all now have dark:
+      variants for proper dark mode appearance.
+
+   d) Voice input error feedback
+      If voice recognition is not supported or fails, an error message is now
+      shown to the user in the error box (previously only logged to console).
+
+   e) Voice input guard
+      Added a check before calling SpeechRecognition: if not supported, shows
+      a user-visible error instead of crashing with "SpeechRecognition is not
+      defined".
+
+--------------------------------------------------------------------------------
+SUMMARY OF ALL FILES CHANGED
+--------------------------------------------------------------------------------
+
+Backend:
+  - backend/controllers/complaintController.js  (bug fix + getTrends added)
+  - backend/routes/complaintRoutes.js           (trends route added)
+
+Frontend:
+  - frontend/src/services/api.js                (deleteComplaint + fetchTrends)
+  - frontend/src/pages/AdminDashboard.jsx       (real trends, resolution rate)
+  - frontend/src/App.jsx                        (real Analytics, real Alerts)
+  - frontend/src/pages/Complaints.jsx           (delete, dark mode, AI expand)
+  - frontend/src/components/ComplaintForm.jsx   (char count, colors, dark mode)
+
+================================================================================
+  COLOR SCHEME CHANGE — ROUND 3 (Indigo + Amber + Pink)
+================================================================================
+
+  Previous palette:  Navy Blue (#0B3C5D) + Sky Blue (#328CC1) + Soft Orange (#F4A261)
+  New palette:       Deep Indigo (#1e1b4b) + Violet (#6366f1) + Amber (#f59e0b) + Pink (#ec4899)
+
+  Rationale: The indigo/violet palette is the most popular choice for modern AI
+  and SaaS products in 2025-2026 (used by Linear, Vercel, Supabase, etc.).
+  It reads as cutting-edge and technical while remaining professional.
+
+  Files changed:
+    - tailwind.config.js       (new color tokens + glow shadows)
+    - index.css                (updated glow classes + scrollbar + shimmer bg)
+    - Login.jsx                (panel gradient + blob colors + button gradient)
+    - Sidebar.jsx              (bg gradient + active state + logo badge + avatar)
+    - Navbar.jsx               (avatar gradient + search ring)
+    - AdminDashboard.jsx       (COLORS array + chart stroke + stat card gradients)
+    - CustomerDashboard.jsx    (banner gradient + stat card gradients + step badges)
+    - App.jsx                  (chart COLORS array + progress bar gradient)
+
+  New color token mapping:
+    aura-dark   : #0B3C5D → #1e1b4b  (deep indigo, dark backgrounds)
+    aura-dark-2 : #062b44 → #0f0d2e  (darkest indigo)
+    aura-light  : #328CC1 → #6366f1  (indigo 500, primary brand)
+    aura-glow   : #4AAEF0 → #818cf8  (indigo 400, accent/glow)
+    aura-orange : #F4A261 → #f59e0b  (amber 400, warm accent)
+    aura-bg     : #F0F4F8 → #f5f3ff  (indigo 50, page background)
+
+  Stat card colors:
+    Total     → Indigo gradient  (#6366f1 → #818cf8) + indigo glow
+    Pending   → Amber gradient   (#f59e0b → #f97316) + amber glow
+    Resolved  → Emerald gradient (#10b981 → #059669) + green glow  [unchanged]
+    Rate/Row4 → Pink gradient    (#ec4899 → #be185d) + pink glow
+
+================================================================================
+  UI OVERHAUL — ROUND 2 (Visual Polish)
+================================================================================
+
+FILES CHANGED IN UI OVERHAUL:
+  - frontend/tailwind.config.js
+  - frontend/src/index.css
+  - frontend/src/pages/Login.jsx
+  - frontend/src/components/Sidebar.jsx
+  - frontend/src/components/Navbar.jsx
+  - frontend/src/components/Layout.jsx
+  - frontend/src/pages/AdminDashboard.jsx
+  - frontend/src/pages/CustomerDashboard.jsx
+
+--------------------------------------------------------------------------------
+A. tailwind.config.js — Extended design system
+--------------------------------------------------------------------------------
+  - New colors: aura-dark-2 (#062b44), aura-glow (#4AAEF0), updated aura-bg
+  - New backgroundImage: gradient presets for all 4 stat card types
+  - New animations: float, float-slow, float-delayed, glow-pulse, shimmer,
+    slide-up, fade-scale
+  - New keyframes for all above animations
+  - New custom boxShadow: glow-blue, glow-orange, glow-green, glow-purple,
+    card, card-hover
+
+B. index.css — Global style utilities
+--------------------------------------------------------------------------------
+  - Google Fonts Inter import for premium typography
+  - Anti-aliasing enabled
+  - .text-gradient-blue / .text-gradient-aura  — gradient text utility classes
+  - .glass / .glass-dark / .glass-light        — glassmorphism utilities
+  - .bg-dot-pattern / .bg-dot-pattern-dark     — dot grid backgrounds
+  - .shimmer                                   — loading shimmer animation
+  - .card-glow-blue/orange/green/purple        — colored card drop shadows
+  - .nav-active-glow                           — sidebar active item glow
+  - .input-premium                             — styled input base class
+  - Keyframe definitions for float, shimmer, glow-pulse
+
+C. Login.jsx — Full split-screen redesign
+--------------------------------------------------------------------------------
+  BEFORE: Single centered card on plain background.
+  AFTER:  Two-panel full-screen layout:
+
+  Left panel (52% width, hidden on mobile):
+    - Deep navy gradient background (from #062b44 to #0d4e78)
+    - Animated dot grid overlay
+    - Three floating gradient orbs (blue, orange, cyan) with float animations
+    - AURA AI logo with glassmorphism badge
+    - Giant hero text with outlined stroke CSS effect on "Complaint"
+    - "Powered by Google Gemini" accent label
+    - 3 feature highlight pills (glassmorphism cards) with icons
+
+  Right panel:
+    - Gradient submit button (dark to light blue) with shadow glow
+    - Clean .input-premium styled inputs
+    - Demo credential hint box below the card
+    - Mobile logo shown only when left panel is hidden
+
+D. Sidebar.jsx — Premium dark sidebar redesign
+--------------------------------------------------------------------------------
+  BEFORE: Flat dark bg, basic nav links, no user info.
+  AFTER:
+    - Gradient background (deep navy → mid-navy)
+    - Dot grid texture overlay
+    - Floating blur orbs for depth
+    - Logo with blue gradient background + glow shadow
+    - Active nav: gradient background + left accent bar + dot indicator
+    - Inactive nav: 45% opacity, hover brightens to 80%
+    - User profile section at bottom:
+      - Gradient avatar with initials
+      - Name + role label
+      - Inline logout button (red on hover)
+    - Logout functionality moved from Navbar to Sidebar profile card
+
+E. Navbar.jsx — Glassmorphism + dark mode toggle
+--------------------------------------------------------------------------------
+  BEFORE: Plain white header, User icon, external logout button.
+  AFTER:
+    - Frosted glass background (glass-light utility + backdrop-blur-xl)
+    - Rounded pill search bar
+    - Dark mode toggle button (Sun/Moon icon, live toggle)
+    - Gradient avatar showing user initials (removed generic User icon)
+    - Simplified layout — logout now lives in Sidebar
+
+F. Layout.jsx — Content area polish
+--------------------------------------------------------------------------------
+  - Consistent bg-aura-bg (light) / dark:bg-slate-950 (dark)
+  - Content wrapped in max-w-screen-2xl for ultra-wide screens
+  - Increased padding to lg:p-8 on larger screens
+
+G. AdminDashboard.jsx — Gradient stat cards + polished table
+--------------------------------------------------------------------------------
+  BEFORE: Plain white cards with colored icon backgrounds.
+  AFTER:
+    - 4 fully gradient stat cards (each unique color):
+        Total     → blue gradient   + card-glow-blue
+        Pending   → orange gradient + card-glow-orange
+        Resolved  → green gradient  + card-glow-green
+        Rate      → purple gradient + card-glow-purple
+    - Each card has inner glow orb, white icon bg, trend badge
+    - Cards lift on hover (-translate-y-1)
+    - Chart containers use shadow-card + improved dot styling on area chart
+    - Category breakdown now has mini progress bars per category
+    - Table has shimmer loading state, gradient avatars, improved header row
+
+H. CustomerDashboard.jsx — Complete visual upgrade
+--------------------------------------------------------------------------------
+  BEFORE: Plain header text + basic stat boxes.
+  AFTER:
+    - Full-width gradient welcome banner (dark navy) with:
+        - Floating blur orb animation
+        - Dot grid texture
+        - "AI-Powered Support" accent label with Sparkles icon
+        - "New Complaint" button in white, turns cyan on hover
+    - 3 gradient stat cards (same style as Admin)
+    - Recent submissions list: improved cards with hover border + transitions
+    - Empty state with icon box + CTA link
+    - "How It Works" panel redesigned with step numbers in bordered boxes
+    - AI Processing info card with gradient icon
+
+--------------------------------------------------------------------------------
+KNOWN REMAINING ISSUES (not fixed — out of hackathon scope)
+--------------------------------------------------------------------------------
+
+- .env file contains real credentials and is committed to git. For a real
+  product, rotate the MongoDB password and Gemini API key.
+- PDF export still uses window.print() — no actual PDF generation library.
+- No backend search filtering — all filtering is done client-side.
+- JWT expiry is 30 days — acceptable for a demo.
+
+================================================================================

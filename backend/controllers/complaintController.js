@@ -110,7 +110,7 @@ const getStats = async (req, res) => {
         const pending = await Complaint.countDocuments({ status: 'pending' });
         const resolved = await Complaint.countDocuments({ status: 'resolved' });
 
-        constByCategory = await Complaint.aggregate([
+        const byCategory = await Complaint.aggregate([
             { $group: { _id: '$category', value: { $count: {} } } },
             { $project: { name: '$_id', value: 1, _id: 0 } }
         ]);
@@ -119,8 +119,45 @@ const getStats = async (req, res) => {
             total,
             pending,
             resolved,
-            byCategory: constByCategory
+            byCategory
         });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get 7-day complaint trend (complaints per day)
+// @route   GET /api/complaints/trends
+// @access  Private/Admin
+const getTrends = async (req, res) => {
+    try {
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+        sevenDaysAgo.setHours(0, 0, 0, 0);
+
+        const results = await Complaint.aggregate([
+            { $match: { createdAt: { $gte: sevenDaysAgo } } },
+            {
+                $group: {
+                    _id: { $dayOfWeek: '$createdAt' },
+                    complaints: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const trendMap = {};
+        results.forEach(r => { trendMap[r._id] = r.complaints; });
+
+        const trend = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dayOfWeek = d.getDay() + 1; // MongoDB $dayOfWeek: 1=Sun, 7=Sat
+            trend.push({ name: days[d.getDay()], complaints: trendMap[dayOfWeek] || 0 });
+        }
+
+        res.json(trend);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -132,5 +169,6 @@ module.exports = {
     getComplaintById,
     updateComplaintStatus,
     deleteComplaint,
-    getStats
+    getStats,
+    getTrends
 };
