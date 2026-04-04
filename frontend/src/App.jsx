@@ -42,7 +42,7 @@ function Analytics() {
         <div className="p-8 space-y-8 animate-in fade-in duration-700">
             <div>
                 <h1 className="text-2xl font-bold text-aura-dark dark:text-white">In-depth Analytics</h1>
-                <p className="text-gray-400 text-sm font-medium">AI-powered insights across all complaint vectors</p>
+                <p className="text-gray-400 text-sm font-medium">AI-powered insights across all complaint vectors.</p>
             </div>
 
             {/* Summary Cards */}
@@ -240,7 +240,7 @@ function Alerts() {
 
                 {loading ? (
                     <div className="p-6 space-y-3">
-                        {[1,2,3].map(i => <div key={i} className="h-16 bg-gray-50 dark:bg-slate-700/30 animate-pulse rounded-xl"></div>)}
+                        {[1, 2, 3].map(i => <div key={i} className="h-16 bg-gray-50 dark:bg-slate-700/30 animate-pulse rounded-xl"></div>)}
                     </div>
                 ) : highPriority.length === 0 ? (
                     <div className="p-12 text-center">
