@@ -15,9 +15,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/complaints', complaintRoutes);
-app.use('/api/users',      userRoutes);
-app.use('/api/ai',         aiRoutes);
+app.use('/complaints', complaintRoutes);
+app.use('/users',      userRoutes);
+app.use('/ai',         aiRoutes);
 
 app.get('/', (req, res) => {
     res.send('AURA AI API is running...');

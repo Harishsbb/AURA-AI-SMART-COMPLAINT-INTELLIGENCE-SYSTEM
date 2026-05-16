@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_URL = window.location.origin.includes('localhost') 
-    ? 'http://localhost:5000/api' 
+    ? 'http://localhost:5000' 
     : '/api';
 
 const api = axios.create({
